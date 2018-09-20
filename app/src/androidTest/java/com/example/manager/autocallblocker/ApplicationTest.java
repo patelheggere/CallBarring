@@ -1,4 +1,4 @@
-package com.example.manager.autocallblocker;
+package com.patelheggere.manager.autocallblocker;
 
 import android.app.Application;
 import android.test.ApplicationTestCase;

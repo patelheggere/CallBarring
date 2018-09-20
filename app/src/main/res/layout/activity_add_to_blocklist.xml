@@ -8,7 +8,7 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    android:background="#c72323"
+    android:background="@android:color/holo_blue_light"
     >
 
     <TextView
@@ -16,7 +16,16 @@
         android:layout_height="wrap_content"
         android:layout_gravity="top|center_horizontal"
         android:text="Add Phone Number"
+        android:textStyle="bold"
+        android:textColor="@android:color/black"
         android:textSize="22sp" />
+
+    <Button
+        android:id="@+id/btn_from_contacts"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:text="get from contacts"/>
 
     <TableLayout
         android:layout_width="fill_parent"
@@ -29,6 +38,20 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
+
+        </TableRow>
+
+        <TableRow
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" >
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dip"
+                android:text="Country code: "
+                android:textColor="@android:color/black"
+                android:textSize="15sp" />
             <EditText
                 android:layout_width="10sp"
                 android:layout_height="wrap_content"
@@ -37,23 +60,6 @@
                 android:id="@+id/country_code_et"
                 android:inputType="number"
                 android:layout_column="1" />
-        </TableRow>
-
-        <TableRow
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content" >
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="10dip"
-                android:text="Country code "
-                android:textSize="15sp" />
-
-            <Spinner
-                android:id="@+id/planets_spinner"
-                android:layout_width="fill_parent"
-                android:layout_height="wrap_content" />
 
         </TableRow>
 
@@ -64,18 +70,20 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="10dip"
-                android:text="Phone Number "
+                android:text="Phone Number:"
+                android:textColor="@android:color/black"
                 android:textSize="15sp" />
 
             <EditText
-                android:layout_width="fill_parent"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="0dip"
                 android:layout_weight="1"
                 android:id="@+id/phone_et"
                 android:inputType="number"
-                android:text="2222" />
+                android:focusedByDefault="true"
+                android:textColor="@android:color/black"
+                android:hint="Enter Number" />
         </TableRow>
     </TableLayout>
 

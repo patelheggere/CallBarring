@@ -1,13 +1,22 @@
-package com.example.manager.autocallblocker;
+package com.patelheggere.manager.autocallblocker;
 
 import java.util.List;
 
+import android.Manifest;
+import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
-import android.support.v7.app.ActionBarActivity;
+import android.provider.ContactsContract;
+import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
+import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -18,8 +27,12 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
-public class MainActivity extends ActionBarActivity implements OnClickListener, OnItemLongClickListener {
+public class MainActivity extends AppCompatActivity implements OnClickListener, OnItemLongClickListener {
+
+    private static int PHONE_PERMISSION = 600;
+    private static int CONTACTS_PERM = 700;
 
     // Declaration all on screen components of the Main screen
     private Button add_blacklist_btn;
@@ -35,10 +48,22 @@ public class MainActivity extends ActionBarActivity implements OnClickListener, 
     // This holds the value of the row number, which user has selected for further action
     private int selectedRecordPosition = -1;
 
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+       if(ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.READ_PHONE_STATE)!= PackageManager.PERMISSION_GRANTED)
+       {
+           ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.READ_PHONE_STATE}, PHONE_PERMISSION);
+       }
+       if(ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.READ_SMS)!=PackageManager.PERMISSION_GRANTED &&
+               ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.SEND_SMS)!=PackageManager.PERMISSION_GRANTED)
+       {
+           ActivityCompat.requestPermissions(MainActivity.this, new String[]{Manifest.permission.READ_SMS, Manifest.permission.SEND_SMS}, CONTACTS_PERM);
+       }
 
         // Initialization of the button of the Main screen
         add_blacklist_btn = (Button) findViewById(R.id.add_blacklist_btn);
@@ -53,9 +78,30 @@ public class MainActivity extends ActionBarActivity implements OnClickListener, 
         final LayoutInflater inflater = (LayoutInflater) this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         final View rowView = inflater.inflate(R.layout.list_item, listview, false);
         listview.addHeaderView(rowView);
-
         // Attach OnItemLongClickListener to track user action and perform accordingly
         listview.setOnItemLongClickListener(this);
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        if(requestCode==PHONE_PERMISSION)
+        {
+            if(grantResults.length>0 && grantResults[0]==PackageManager.PERMISSION_GRANTED)
+            {
+                Toast.makeText(MainActivity.this, "Permission granted", Toast.LENGTH_LONG).show();
+            }
+            else {
+                Toast.makeText(MainActivity.this, "Permission Denied", Toast.LENGTH_LONG).show();
+            }
+        }
+        else if(requestCode==CONTACTS_PERM) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED && grantResults[1] == PackageManager.PERMISSION_GRANTED) {
+                Toast.makeText(MainActivity.this, "Permission granted", Toast.LENGTH_LONG).show();
+            }
+            else {
+                Toast.makeText(MainActivity.this, "Permission Denied for SMS", Toast.LENGTH_LONG).show();
+            }
+        }
     }
 
     private void populateNoRecordMsg()
@@ -66,7 +112,7 @@ public class MainActivity extends ActionBarActivity implements OnClickListener, 
             final TextView tv = new TextView(this);
             tv.setPadding(5, 5, 5, 5);
             tv.setTextSize(15);
-            tv.setText("No Record Found !!");
+            tv.setText("All Incoming calls are blocked !!");
             listview.addFooterView(tv);
         }
     }
@@ -77,7 +123,11 @@ public class MainActivity extends ActionBarActivity implements OnClickListener, 
         if (v == add_blacklist_btn) {
             startActivity(new Intent(this, AddToBlocklistActivity.class));
         }
+
     }
+
+
+
 
     @Override
     public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
@@ -103,7 +153,6 @@ public class MainActivity extends ActionBarActivity implements OnClickListener, 
         // Remove the footer view
         if(listview.getChildCount() > 1)
             listview.removeFooterView(listview.getChildAt(listview.getChildCount() - 1));
-
         //Now, link the  CustomArrayAdapter with the ListView
         listview.setAdapter(new CustomArrayAdapter(this, R.layout.list_item, blockList));
 
@@ -127,8 +176,6 @@ public class MainActivity extends ActionBarActivity implements OnClickListener, 
                         try {
 
                             blackListDao.delete(blockList.get(selectedRecordPosition));
-
-                            // Removing the same from the List to remove from display as well
                             blockList.remove(selectedRecordPosition);
                             listview.invalidateViews();
 
